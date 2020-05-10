@@ -18,7 +18,8 @@ defmodule PointingPokerWeb.Router do
     pipe_through :browser
 
     get "/", HomeController, :index
-    get "/room", RoomController, :index
+    get "/create_room", RoomController, :index
+
 
 
     #live "/", PageLive, :index

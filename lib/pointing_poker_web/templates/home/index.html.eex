@@ -1,5 +1,5 @@
 <div class="row">
 
-        <a href =/room><button type="button" class="btn btn-info">Create new session</button></a>
+        <a href =/create_room><button type="button" class="btn btn-info">Create new session</button></a>
 
 </div>
