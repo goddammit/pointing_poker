@@ -1,11 +1,12 @@
 defmodule PointingPokerWeb.RoomController do
 
   use PointingPokerWeb, :controller
-  use GenServer
 
 
-  def index(conn, _params) do
-    redirect(conn, to: "/#{:rand.uniform(200)}" )
+  def new(conn, _params) do
+    room_id = Base.encode16(:crypto.strong_rand_bytes(8))
+    
+    redirect(conn, to: "/room/#{room_id}" )
   end
 
 
