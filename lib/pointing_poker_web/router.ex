@@ -19,6 +19,7 @@ defmodule PointingPokerWeb.Router do
 
     get "/", HomeController, :index
     post "/room", RoomController, :new
+    live "/room/:room_id", RoomLive
 
 
 
