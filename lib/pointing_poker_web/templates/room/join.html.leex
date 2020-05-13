@@ -1,13 +1,14 @@
 <div class="row">
   <p>
     Hello!
-    Nice meeting you, <%= @a%>
+    Nice meeting you, stranger.
   </p>
 </div>
 <div class="row">
   <p>
-    <form phx-change="name_change">
+    <form phx-submit="join">
       <input type=text name=username />
+      <button type=submit>send</button>
     </form>
   </p>
 

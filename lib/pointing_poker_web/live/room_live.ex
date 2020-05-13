@@ -5,19 +5,47 @@ defmodule PointingPokerWeb.RoomLive do
 
   def mount(params, session, socket) do
     room_id = params["room_id"]
-    {:ok,
-    assign(socket,
-    a: "Stranger",
+    case Registry.lookup(Registry.Rooms, room_id) do
+      [{pid, _meta}] ->
+        {:ok, assign(socket, [user: nil]
+        )}
+      [] ->
+        {:ok, assign(socket, [
+          error: :no_room])}
+    end
 
-    )}
+  end
+
+  @impl true
+  def render(%{error: :no_room} = assigns) do
+    ~L"""
+    No room
+    """
+  end
+
+
+  @impl true
+  def render(%{user: nil} = assigns) do
+    Phoenix.View.render(PointingPokerWeb.RoomView, "join.html", assigns )
+  end
+
+
+  @impl true
+
+  def render(%{} = assigns) do
+    Phoenix.View.render(PointingPokerWeb.RoomView, "vote.html", assigns )
   end
 
   @impl true
 
+  def handle_event("join", data, socket) do
+    {:noreply, assign(socket, user: data["username"])}
+  end
+
   def handle_event(event_name, data, socket) do
     IO.inspect({event_name, data})
     {:noreply, assign(socket,
-    a: data["username"]
+    user: data["username"]
 
     )}
   end
@@ -26,14 +54,5 @@ defmodule PointingPokerWeb.RoomLive do
     {:noreply, socket}
   end
 
-  @impl true
-  def render(assigns) do
-    ~L"""
-    This does nothing
-    <%= @a%>
-    """
-
-    Phoenix.View.render(PointingPokerWeb.RoomView, "join.html", assigns )
-  end
 
 end
