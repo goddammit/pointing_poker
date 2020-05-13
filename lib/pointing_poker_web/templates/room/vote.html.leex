@@ -3,8 +3,8 @@
     Vote, <%= @user%>
   </p>
 </div>
-<div class="row">
-  <p>
-  </p>
 
-</div>
+
+     <%=for user <- @user_list do%>
+     <div class="row"><%= @user%></div>
+     <% end %>

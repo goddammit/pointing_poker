@@ -8,8 +8,18 @@ defmodule PointingPoker.Room do
   @impl GenServer
   def init (%{room_id: room_id}) do
     {:ok, %{
-      room_id: room_id
+      room_id: room_id,
+      user_list: [],
       }}
+  end
+
+  @impl true
+  def handle_call({:join, username, pid}, _from, state) do
+    users = state.user_list
+    state = %{state | user_list: [{username, pid} | users]}
+    IO.inspect({self(), state})
+    {:reply, state.user_list, state}
+
   end
 
 end

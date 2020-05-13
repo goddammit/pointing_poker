@@ -7,7 +7,7 @@ defmodule PointingPokerWeb.RoomLive do
     room_id = params["room_id"]
     case Registry.lookup(Registry.Rooms, room_id) do
       [{pid, _meta}] ->
-        {:ok, assign(socket, [user: nil]
+        {:ok, assign(socket, [user: nil, room: pid, members: %{}]
         )}
       [] ->
         {:ok, assign(socket, [
@@ -39,7 +39,12 @@ defmodule PointingPokerWeb.RoomLive do
   @impl true
 
   def handle_event("join", data, socket) do
-    {:noreply, assign(socket, user: data["username"])}
+    user_list = GenServer.call(socket.assigns[:room], {:join, data["username"], self()})
+    {:noreply, assign(socket, user: data["username"], user_list: user_list)}
+  end
+
+  def handle_event("vote", data, socket) do
+    GenServer.call(socket.assigns[:room], {:vote, data["value"] })
   end
 
   def handle_event(event_name, data, socket) do
@@ -53,6 +58,16 @@ defmodule PointingPokerWeb.RoomLive do
   def handle_info(data, socket) do
     {:noreply, socket}
   end
+#  def handle_info({:someone_voted, username, value}, socket) do
+#    {:noreply, socket}
+#  end
+
+#  def handle_info(data, socket) do
+#    new_members = Map.put(socket.assigns[:members], username, value)
+#    {:noreply, assign(socket,
+#    members: new_members
+
+#  end
 
 
 end
