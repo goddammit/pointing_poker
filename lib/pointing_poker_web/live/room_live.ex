@@ -7,7 +7,12 @@ defmodule PointingPokerWeb.RoomLive do
     room_id = params["room_id"]
     case Registry.lookup(Registry.Rooms, room_id) do
       [{pid, _meta}] ->
-        {:ok, assign(socket, [user: nil, room: pid, members: %{}]
+        {:ok, assign(socket, [
+          user: nil,
+          room: pid,
+          members: %{},
+          enabled_votes: [1,2,3,5,8,13]
+        ]
         )}
       [] ->
         {:ok, assign(socket, [

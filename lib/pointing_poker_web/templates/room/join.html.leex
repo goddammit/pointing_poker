@@ -1,15 +1,32 @@
+
+<br/>
 <div class="row">
-  <p>
+  <div class = "col-sm-6 d-flex justify-content-left">
     Hello!
     Nice meeting you, stranger.
-  </p>
+  </div>
 </div>
-<div class="row">
-  <p>
-    <form phx-submit="join">
-      <input type=text name=username />
-      <button type=submit>send</button>
-    </form>
-  </p>
+<br/>
 
+    <form phx-submit="join" method = "post">
+      <input type="hidden" name="_csrf_token" value ="<%=Plug.CSRFProtection.get_csrf_token() %>" />
+        <div class="row">
+          <div class = "col-sm-6 d-flex justify-content-center">
+            <div class ="input-group-prepend">
+              <span class="input-group-text" id="basic-addon1">Name</span>
+            </div>
+            <input id = "username-input" id="username" class="form-control" type = "text" name = "username">
+          </div>
+        </div>
+<br/>
+<div class="row">
+  <div class = "col-sm-4 d-flex justify-content-center">
+    <div class ="input-group input-group-lg">
+      <div class ="input-group-prepend">
+        <button type="submit" class="btn btn-lg btn-outline-success">send</button>
+      </div>
+    </div>
+  </div>
 </div>
+
+    </form>
