@@ -44,7 +44,7 @@ defmodule PointingPokerWeb.RoomLive do
 
   @impl true
   def handle_event("join", data, socket) do
-    {:ok, id, members} = GenServer.call(socket.assigns[:room_pid], {:join, self(), data["username"]})
+    {:ok, id, members} = PointingPoker.Room.join(socket.assigns.room_pid, self(), data["username"])
     {:noreply, assign(socket, members: members, user: %{
       id: id,
       username: data["username"]
@@ -52,7 +52,8 @@ defmodule PointingPokerWeb.RoomLive do
   end
 
   def handle_event("vote", %{"value" => vote}, socket) do
-    GenServer.cast(socket.assigns[:room_pid], {:vote, socket.assigns.user.id, vote })
+    :ok = PointingPoker.Room.vote(socket.assigns.room_pid, socket.assigns.user.id, vote)
+
     {:noreply, socket}
   end
 
