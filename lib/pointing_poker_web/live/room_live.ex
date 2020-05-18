@@ -11,7 +11,7 @@ defmodule PointingPokerWeb.RoomLive do
           user: nil,
           room_pid: pid,
           members: %{},
-          enabled_votes: [1,2,3,5,8,13,21,"?"]
+          enabled_votes: [0,1,2,3,5,8,13,21,"?"]
 
         )}
       [] ->
@@ -51,10 +51,24 @@ defmodule PointingPokerWeb.RoomLive do
     })}
   end
 
-  def handle_event("vote", data, socket) do
-    GenServer.call(socket.assigns[:room_pid], {:vote, socket.assigns[:room_pid], data["value"] })
-    {:noreply, assign(socket, user: data["username"])}
+  def handle_event("vote", %{"value" => vote}, socket) do
+    GenServer.cast(socket.assigns[:room_pid], {:vote, socket.assigns.user.id, vote })
+    {:noreply, socket}
   end
+
+  def handle_info({:update, new_members}, socket) do
+    {:noreply, assign(socket,
+    members: new_members
+    )}
+  end
+
+#  def handle_info({:someone_voted, username, value}, socket) do
+#    {:noreply, socket}
+#  end
+
+
+
+
 
   def handle_event(event_name, data, socket) do
     IO.inspect({event_name, data})
@@ -63,31 +77,5 @@ defmodule PointingPokerWeb.RoomLive do
 
     )}
   end
-
-  def handle_info({:joined, id, member}, socket) do
-    new_members = Map.put(socket.assigns.members, id, member)
-    {:noreply, assign(socket,
-    members: new_members
-    )}
-  end
-
-  def handle_info({:left, id}, socket) do
-    new_members = Map.delete(socket.assigns.members, id)
-    {:noreply, assign(socket,
-    members: new_members
-    )}
-  end
-#  def handle_info({:someone_voted, username, value}, socket) do
-#    {:noreply, socket}
-#  end
-
-  def handle_info({:someone_voted, username, value}, socket) do
-    new_members = Map.put(socket.assigns.members, username, value)
-    {:noreply, assign(socket,
-    members: new_members
-    )}
-
-  end
-
 
 end

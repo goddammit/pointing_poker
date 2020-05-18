@@ -25,18 +25,28 @@ defmodule PointingPoker.Room do
     new_members = Map.put(state.members, ref, joined_member)
 
     Enum.each(new_members, fn {_id, member} ->
-      send(member.pid, {:joined, ref, joined_member})
+      send(member.pid, {:update, new_members})
     end)
     {:reply, {:ok, ref, new_members}, %{state | members: new_members}}
 
   end
+
+  def handle_cast({:vote, id, incoming_vote}, state) do
+    new_state = update_in(state.members[id].vote, fn _ -> incoming_vote end)
+    Enum.each(new_state.members, fn {_id, member} ->
+      send(member.pid, {:update, new_state.members})
+    end)
+    {:noreply, new_state}
+
+  end
+
 
   def handle_info({:DOWN, ref, :process, _pid, _reason}, state) do
     new_members =
       Map.delete(state.members, ref)
 
     Enum.each(new_members, fn {_id, member} ->
-        send(member.pid, {:left, ref})
+        send(member.pid, {:update, ref, new_members})
       end)
 
   {:noreply, %{state | members: new_members}}
