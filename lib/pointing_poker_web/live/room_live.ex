@@ -7,16 +7,17 @@ defmodule PointingPokerWeb.RoomLive do
     room_id = params["room_id"]
     case Registry.lookup(Registry.Rooms, room_id) do
       [{pid, _meta}] ->
-        {:ok, assign(socket, [
+        {:ok, assign(socket,
           user: nil,
-          room: pid,
+          room_pid: pid,
           members: %{},
-          enabled_votes: [1,2,3,5,8,13]
-        ]
+          enabled_votes: [1,2,3,5,8,13,21,"?"]
+
         )}
       [] ->
         {:ok, assign(socket, [
-          error: :no_room])}
+          error: :no_room
+          ])}
     end
 
   end
@@ -42,37 +43,51 @@ defmodule PointingPokerWeb.RoomLive do
   end
 
   @impl true
-
   def handle_event("join", data, socket) do
-    user_list = GenServer.call(socket.assigns[:room], {:join, data["username"], self()})
-    {:noreply, assign(socket, user: data["username"], user_list: user_list)}
+    {:ok, id, members} = GenServer.call(socket.assigns[:room_pid], {:join, self(), data["username"]})
+    {:noreply, assign(socket, members: members, user: %{
+      id: id,
+      username: data["username"]
+    })}
   end
 
   def handle_event("vote", data, socket) do
-    GenServer.call(socket.assigns[:room], {:vote, data["value"] })
+    GenServer.call(socket.assigns[:room_pid], {:vote, socket.assigns[:room_pid], data["value"] })
+    {:noreply, assign(socket, user: data["username"])}
   end
 
   def handle_event(event_name, data, socket) do
     IO.inspect({event_name, data})
     {:noreply, assign(socket,
-    user: data["username"]
+    a: data["username"]
 
     )}
   end
 
-  def handle_info(data, socket) do
-    {:noreply, socket}
+  def handle_info({:joined, id, member}, socket) do
+    new_members = Map.put(socket.assigns.members, id, member)
+    {:noreply, assign(socket,
+    members: new_members
+    )}
+  end
+
+  def handle_info({:left, id}, socket) do
+    new_members = Map.delete(socket.assigns.members, id)
+    {:noreply, assign(socket,
+    members: new_members
+    )}
   end
 #  def handle_info({:someone_voted, username, value}, socket) do
 #    {:noreply, socket}
 #  end
 
-#  def handle_info(data, socket) do
-#    new_members = Map.put(socket.assigns[:members], username, value)
-#    {:noreply, assign(socket,
-#    members: new_members
+  def handle_info({:someone_voted, username, value}, socket) do
+    new_members = Map.put(socket.assigns.members, username, value)
+    {:noreply, assign(socket,
+    members: new_members
+    )}
 
-#  end
+  end
 
 
 end

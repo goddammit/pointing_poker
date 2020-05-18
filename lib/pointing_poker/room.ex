@@ -9,25 +9,38 @@ defmodule PointingPoker.Room do
   def init (%{room_id: room_id}) do
     {:ok, %{
       room_id: room_id,
-      user_list: [],
+      members: %{}
       }}
   end
 
-  @impl true
-  def handle_call({:join, username, pid}, _from, state) do
+  @impl GenServer
+  def handle_call({:join, pid, username}, _from, state) do
     ref = Process.monitor(pid)
-    joined_member =%{
-      username: username,
-      pid: pid,
-      vote: nil}
-    users = state.user_list
-    state = %{state | user_list: [{username, pid} | users]}
-    Enum.each(users, fn {_id, member} ->
+
+    joined_member= %{
+        username: username,
+        pid: pid,
+        vote: nil
+        }
+    new_members = Map.put(state.members, ref, joined_member)
+
+    Enum.each(new_members, fn {_id, member} ->
       send(member.pid, {:joined, ref, joined_member})
     end)
-    IO.inspect({self(), state})
-    {:reply, state.user_list, state}
+    {:reply, {:ok, ref, new_members}, %{state | members: new_members}}
 
   end
+
+  def handle_info({:DOWN, ref, :process, _pid, _reason}, state) do
+    new_members =
+      Map.delete(state.members, ref)
+
+    Enum.each(new_members, fn {_id, member} ->
+        send(member.pid, {:left, ref})
+      end)
+
+  {:noreply, %{state | members: new_members}}
+  end
+
 
 end

@@ -1,10 +1,36 @@
+
 <div class="row">
-  <p>
-    Vote, <%= @user%>
-  </p>
+  <div class="col-sm-5 ">
+    <div class="btn-group-vertical">
+        <%=for row <- Enum.chunk_every(@enabled_votes, 3) do %>
+        <div class="btn-group btn-group-lg">
+          <%= for value <-row do %>
+            <button phx-click="vote" value="<%= value %>" class="btn btn-primary"><%= value %></button>
+            <% end %>
+          </div>
+          <% end %>
+    </div>
+  </div>
+  <div class="col-sm-7">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th> Name </th>
+          <th class="text-center"> Ready? </th>
+          <th class="text-center"> Vote </th>
+        </tr>
+      </thead>
+      <tbody>
+        <%=for {_id, member} <- @members do %>
+        <tr>
+          <td class="text-center"> <%= member.username %></td>
+          <td class="text-center">? </td>
+          <td class="text-center"> ? </td>
+        <tr>
+        <% end %>
+
+      </tbody>
+
+    </table>
+  </div>
 </div>
-
-
-     <%=for user <- @user_list do%>
-     <td class="text_center"><%= @user%></td>
-     <% end %>
