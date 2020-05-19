@@ -21,4 +21,9 @@ defmodule PointingPoker.Room do
 
   end
 
+  def show_votes(room_pid, show) do
+    GenServer.cast(room_pid, {:show_votes, show})
+
+  end
+
 end

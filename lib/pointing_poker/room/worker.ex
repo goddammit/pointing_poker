@@ -9,7 +9,8 @@ defmodule PointingPoker.Room.Worker do
   def init (%{room_id: room_id}) do
     {:ok, %{
       room_id: room_id,
-      members: %{}
+      members: %{},
+      show_votes: false
       }}
   end
 
@@ -41,12 +42,21 @@ defmodule PointingPoker.Room.Worker do
   end
 
 
+  def handle_cast({:show_votes, show}, state) do
+    Enum.each(state.members, fn {_id, member} ->
+      send(member.pid, {:show_votes, show})
+    end)
+    {:noreply, %{state | show_votes: show}}
+
+  end
+
+
   def handle_info({:DOWN, ref, :process, _pid, _reason}, state) do
     new_members =
       Map.delete(state.members, ref)
 
     Enum.each(new_members, fn {_id, member} ->
-        send(member.pid, {:update, ref, new_members})
+        send(member.pid, {:update, new_members})
       end)
 
   {:noreply, %{state | members: new_members}}

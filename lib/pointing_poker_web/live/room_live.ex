@@ -11,7 +11,8 @@ defmodule PointingPokerWeb.RoomLive do
           user: nil,
           room_pid: pid,
           members: %{},
-          enabled_votes: [0,1,2,3,5,8,13,21,"?"]
+          enabled_votes: [0,1,2,3,5,8,13,21,"?"],
+          show_votes: false
 
         )}
       [] ->
@@ -57,9 +58,20 @@ defmodule PointingPokerWeb.RoomLive do
     {:noreply, socket}
   end
 
+  def handle_event("show_votes", _data, socket) do
+    :ok = PointingPoker.Room.show_votes(socket.assigns.room_pid, true)
+    {:noreply, socket}
+  end
+
   def handle_info({:update, new_members}, socket) do
     {:noreply, assign(socket,
     members: new_members
+    )}
+  end
+
+  def handle_info({:show_votes, show}, socket) do
+    {:noreply, assign(socket,
+    show_votes: show
     )}
   end
 

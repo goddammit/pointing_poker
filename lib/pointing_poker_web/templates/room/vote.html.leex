@@ -16,14 +16,22 @@
         <%=for {_id, member} <- @members do %>
         <tr>
           <td class="text-center"> <%= member.username %></td>
-          <td class="text-center">? </td>
-          <td class="text-center"> <%= member.vote %> </td>
+          <td class="text-center"><%= if member.vote != nil do %>
+          Yes
+          <% end %>
+
+          </td>
+          <td class="text-center">
+          <%= if @show_votes  do %>
+           <%= member.vote %>
+          <% end %> </td>
         <tr>
         <% end %>
 
       </tbody>
 
     </table>
+      <button phx-click="show_votes" class="btn btn-success">Show votes</button>
   </div>
   <div class="col-sm-6 ">
     <div class="btn-group-vertical">
