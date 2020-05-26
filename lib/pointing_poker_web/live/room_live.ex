@@ -63,6 +63,12 @@ defmodule PointingPokerWeb.RoomLive do
     {:noreply, socket}
   end
 
+  def handle_event("clear_votes", _data, socket) do
+    :ok = PointingPoker.Room.clear_votes(socket.assigns.room_pid)
+    {:noreply, socket}
+  end
+
+
   def handle_info({:update, new_members}, socket) do
     {:noreply, assign(socket,
     members: new_members
@@ -74,6 +80,7 @@ defmodule PointingPokerWeb.RoomLive do
     show_votes: show
     )}
   end
+
 
 #  def handle_info({:someone_voted, username, value}, socket) do
 #    {:noreply, socket}

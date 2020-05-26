@@ -50,6 +50,21 @@ defmodule PointingPoker.Room.Worker do
 
   end
 
+  def handle_cast(:clear_votes, state) do
+    new_members=
+      Enum.map(state.members, fn {id, member} ->
+        {id, update_in(member.vote, fn _ -> nil end)}
+      end)
+      |> Map.new()
+    Enum.each(new_members, fn {_id, member} ->
+      send(member.pid, {:update, new_members})
+
+    end)
+    {:noreply, %{state | members: new_members, show_votes: false} }
+
+
+  end
+
 
   def handle_info({:DOWN, ref, :process, _pid, _reason}, state) do
     new_members =
