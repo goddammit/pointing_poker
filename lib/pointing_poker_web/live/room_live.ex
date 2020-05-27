@@ -81,6 +81,13 @@ defmodule PointingPokerWeb.RoomLive do
     )}
   end
 
+  def handle_info({:clear_votes, new_members}, socket) do
+    {:noreply, assign(socket,
+    members: new_members,
+    show_votes: false
+    )}
+  end
+
 
 #  def handle_info({:someone_voted, username, value}, socket) do
 #    {:noreply, socket}

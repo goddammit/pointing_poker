@@ -57,7 +57,7 @@ defmodule PointingPoker.Room.Worker do
       end)
       |> Map.new()
     Enum.each(new_members, fn {_id, member} ->
-      send(member.pid, {:update, new_members})
+      send(member.pid, {:clear_votes, new_members})
 
     end)
     {:noreply, %{state | members: new_members, show_votes: false} }
